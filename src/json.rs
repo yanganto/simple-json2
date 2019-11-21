@@ -216,6 +216,20 @@ pub enum JsonValue {
     Null,
 }
 
+impl JsonValue {
+  pub fn get_object(&self) -> &JsonObject {
+    if let JsonValue::Object(obj) = self { return obj; }
+    panic!("JsonValue not a type of JsonValue::Object");
+  }
+
+  pub fn get_string(&self) -> std::string::String {
+    if let JsonValue::String(val) = self {
+      return val.iter().collect::<std::string::String>();
+    }
+    panic!("JsonValue not a type of JsonValue::String");
+  }
+}
+
 impl<I: Input> Parser<I> for Value
 where
     I::Position: Copy,
