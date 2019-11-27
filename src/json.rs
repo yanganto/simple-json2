@@ -7,6 +7,7 @@ use crate::parser::{
 };
 use crate::{literals, parsers};
 use core::convert::TryInto;
+use core::fmt::Debug;
 
 literals! {
     pub WhitespaceChar => '\u{0020}' | '\u{000D}' | '\u{000A}' | '\u{0009}';
@@ -191,8 +192,7 @@ impl<I: Input> Parser<I> for Element {
 
 pub struct Value;
 
-#[cfg_attr(feature = "std", derive(Debug))]
-#[derive(Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq)]
 pub struct NumberValue {
     pub integer: i64,
     pub fraction: u64,
@@ -208,8 +208,7 @@ impl Into<f64> for NumberValue {
     }
 }
 
-#[cfg_attr(feature = "std", derive(Debug))]
-#[derive(Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq)]
 pub enum JsonValue {
     Object(JsonObject),
     Array(Vec<JsonValue>),
