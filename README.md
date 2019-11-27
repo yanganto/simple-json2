@@ -12,5 +12,3 @@ cargo test --no-default-features --lib
 # Run this project in cli (a sample for parsing) in `std` env:
 cargo run
 ```
-
-
