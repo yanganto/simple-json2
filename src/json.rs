@@ -1,9 +1,12 @@
+extern crate alloc;
+use alloc::{vec::Vec, string::String as AllocString};
+
 use crate::parser::{
     Concat, Concat3, Either, Error, Input, OneOf, OneOrMore, Parser, ResultOf, ZeroOrMore,
     ZeroOrOne,
 };
 use crate::{literals, parsers};
-use std::convert::TryInto;
+use core::convert::TryInto;
 
 literals! {
     pub WhitespaceChar => '\u{0020}' | '\u{000D}' | '\u{000A}' | '\u{0009}';
@@ -222,9 +225,9 @@ impl JsonValue {
     panic!("JsonValue not a type of JsonValue::Object");
   }
 
-  pub fn get_string(&self) -> std::string::String {
+  pub fn get_string(&self) -> AllocString {
     if let JsonValue::String(val) = self {
-      return val.iter().collect::<std::string::String>();
+      return val.iter().collect::<AllocString>();
     }
     panic!("JsonValue not a type of JsonValue::String");
   }

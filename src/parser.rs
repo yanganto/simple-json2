@@ -1,8 +1,6 @@
-pub extern crate alloc;
-
-use crate::impls::{SimpleError, SimplePosition};
-#[cfg(not(feature = "std"))]
+extern crate alloc;
 use alloc::vec::Vec;
+use crate::impls::{SimpleError, SimplePosition};
 use core::marker::PhantomData;
 
 pub trait Position: core::ops::Sub<Self, Output = i32> + Copy {

@@ -1,6 +1,6 @@
-use crate::parser::{Error, Position};
-#[cfg(not(feature = "std"))]
+extern crate alloc;
 use alloc::vec::Vec;
+use crate::parser::{Error, Position};
 
 #[cfg_attr(feature = "std", derive(Debug))]
 #[derive(Copy, Clone, Default, PartialEq, Eq)]
