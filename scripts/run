@@ -1,0 +1,11 @@
+#!/usr/bin/env ruby
+EXE_FLAG = ARGV[0];
+
+if (EXE_FLAG == "build")
+  system("cargo build --release --no-default-features --lib")
+elsif (EXE_FLAG == "test")
+  system("cargo test --release --no-default-features --lib")
+else
+  system("cargo run --release");
+end
+

@@ -5,9 +5,8 @@ use crate::parser::{
     Concat, Concat3, Either, Error, Input, OneOf, OneOrMore, Parser, ResultOf, ZeroOrMore,
     ZeroOrOne,
 };
-use crate::{literals, parsers};
-use core::convert::TryInto;
-use core::fmt::Debug;
+use crate::{ literals, parsers };
+use core::{ convert::TryInto, fmt::Debug };
 
 literals! {
     pub WhitespaceChar => '\u{0020}' | '\u{000D}' | '\u{000A}' | '\u{0009}';
