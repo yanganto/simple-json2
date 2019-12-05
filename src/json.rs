@@ -229,6 +229,13 @@ impl JsonValue {
     }
     panic!("JsonValue not a type of JsonValue::String");
   }
+
+  pub fn get_bytes(&self) -> Vec<u8> {
+    if let JsonValue::String(val) = self {
+      return val.iter().map(|c| *c as u8).collect::<Vec<_>>();
+    }
+    panic!("JsonValue not a type of JsonValue::String");
+  }
 }
 
 impl<I: Input> Parser<I> for Value
