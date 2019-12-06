@@ -1,5 +1,5 @@
 extern crate alloc;
-use alloc::vec::Vec;
+use alloc::{ vec::Vec };
 use crate::parser::{Error, Position};
 use core::fmt::Debug;
 

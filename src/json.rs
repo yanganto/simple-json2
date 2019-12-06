@@ -273,7 +273,7 @@ where
 
 pub struct Object;
 
-type JsonObject = Vec<(Vec<char>, JsonValue)>;
+pub type JsonObject = Vec<(Vec<char>, JsonValue)>;
 
 impl<I: Input> Parser<I> for Object {
     type Output = JsonObject;
