@@ -89,7 +89,7 @@ fn coinmarketcap() {
 
   let quote_usd_data: &JsonObject = btc_data.iter()
     .filter_map(|(k, v)|
-      if vecchars_to_vecbytes(k.clone()) == str_to_vecbytes("quote") { Some(v) } else { None }
+      if vecchars_to_vecbytes(k) == str_to_vecbytes("quote") { Some(v) } else { None }
     )
     .nth(0).unwrap()
     .get_object()[0]
@@ -98,7 +98,7 @@ fn coinmarketcap() {
   // println!("{:?}", quote_usd_data);
   let price: &JsonValue = quote_usd_data.iter()
     .filter_map(|(k, v)|
-      if vecchars_to_vecbytes(k.clone()) == str_to_vecbytes("price") { Some(v) } else { None }
+      if vecchars_to_vecbytes(k) == str_to_vecbytes("price") { Some(v) } else { None }
     )
     .nth(0).unwrap();
 
@@ -110,8 +110,8 @@ fn coinmarketcap() {
 
 }
 
-fn vecchars_to_vecbytes(it: impl IntoIterator<Item = char>) -> Vec<u8> {
-  it.into_iter().map(|c| c as u8).collect::<_>()
+fn vecchars_to_vecbytes<I: IntoIterator<Item = char> + Clone>(it: &I) -> Vec<u8> {
+  it.clone().into_iter().map(|c| c as u8).collect::<_>()
 }
 
 fn str_to_vecbytes<'a>(str_val: &'a str) -> Vec<u8> {
