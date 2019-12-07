@@ -1,4 +1,6 @@
-use simple_json::{ self, json::JsonValue, json::JsonObject };
+use simple_json::{ self, json, json::JsonValue, json::JsonObject };
+
+const ZERO_ASCII: u64 = 48;
 
 fn main() {
   coinmarketcap();
@@ -69,7 +71,7 @@ fn coinmarketcap() {
         "last_updated": "2019-08-30T18:51:28.000Z",
         "quote": {
           "USD": {
-            "price": 9558.55163723,
+            "price": 9558.55165723,
             "volume_24h": 13728947008.2722,
             "percent_change_1h": -0.127291,
             "percent_change_24h": 0.328918,
@@ -81,16 +83,31 @@ fn coinmarketcap() {
       }}}"#;
 
   let json_val: JsonValue = simple_json::parse_json(&json_str).unwrap();
-  let btc_data: JsonObject = json_val.get_object()[1].1.get_object()[0].1;
-  let quote_data: JsonObject = btc_data.iter()
-    .filter_map(|(k, v)| if vecchars_to_vecbytes(k.clone()) == str_to_vecbytes("quote") { Some(v) } else { None })
-    .nth(0)
-    .unwrap();
-  let price = quote_data[0].1.get_object().iter()
-    .filter_map(|(k, v)| if vecchars_to_vecbytes(k.clone()) == str_to_vecbytes("price") { Some(v) } else { None })
-    .nth(0)
-    .unwrap();
-  print!("{:?}", price);
+  let btc_data: &JsonObject = json_val.get_object()[1]
+    .1.get_object()[0]
+    .1.get_object();
+
+  let quote_usd_data: &JsonObject = btc_data.iter()
+    .filter_map(|(k, v)|
+      if vecchars_to_vecbytes(k.clone()) == str_to_vecbytes("quote") { Some(v) } else { None }
+    )
+    .nth(0).unwrap()
+    .get_object()[0]
+    .1.get_object();
+
+  // println!("{:?}", quote_usd_data);
+  let price: &JsonValue = quote_usd_data.iter()
+    .filter_map(|(k, v)|
+      if vecchars_to_vecbytes(k.clone()) == str_to_vecbytes("price") { Some(v) } else { None }
+    )
+    .nth(0).unwrap();
+
+  // print!("{:?}", price);
+  if let JsonValue::Number(json::NumberValue{integer: dollars, fraction: cents, ..}) = price {
+    println!("{:?}, {:?}", dollars, cents);
+    println!("{:?}, {:?}", dollars, vecbytes_to_u64(u64_to_vecbytes(*cents),4));
+  }
+
 }
 
 fn vecchars_to_vecbytes(it: impl IntoIterator<Item = char>) -> Vec<u8> {
@@ -101,10 +118,27 @@ fn str_to_vecbytes<'a>(str_val: &'a str) -> Vec<u8> {
   str_val.as_bytes().to_vec()
 }
 
-fn vec_to_int<I>(digits: I) -> u32 where
-  I: IntoIterator<Item = char> {
-  digits
-    .into_iter()
-    .map(|d| d.to_digit(10).unwrap())
-    .fold(0, |acc, d| acc * 10 + d)
+fn u64_to_vecbytes(num: u64) -> Vec<u8> {
+  let mut vecbytes: Vec<u8> = vec![];
+  let mut num = num;
+  while num > 0 {
+    let digit = num % 10;
+    num /= 10;
+    vecbytes.push((digit + ZERO_ASCII) as u8);
+  }
+  vecbytes.into_iter().rev().collect::<Vec<_>>()
+}
+
+fn vecbytes_to_u64(it: impl IntoIterator<Item = u8>, take: usize) -> u64 {
+  it.into_iter().enumerate()
+    .filter_map(|(pos, byte)| {
+      // pos need to take an additional digit for rounding
+      if take == 0 || pos <= take { return Some((pos, (byte as char).to_digit(10).unwrap())); }
+      None
+    })
+    .fold(0, |acc, (pos, digit)| {
+      if take == 0 || pos < take { acc * 10 + digit as u64 }
+      // rounding
+      else { if digit >= 5 { acc + 1 } else { acc } }
+    })
 }
