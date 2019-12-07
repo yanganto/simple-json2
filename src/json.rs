@@ -223,6 +223,11 @@ impl JsonValue {
     panic!("JsonValue not a type of JsonValue::Object");
   }
 
+  pub fn get_array(&self) -> &Vec<JsonValue> {
+    if let JsonValue::Array(vec) = self { return vec; }
+    panic!("JsonValue not a type of JsonValue::Array");
+  }
+
   pub fn get_string(&self) -> AllocString {
     if let JsonValue::String(val) = self {
       return val.iter().collect::<AllocString>();
