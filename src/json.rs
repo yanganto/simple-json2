@@ -7,6 +7,7 @@ use crate::parser::{
 };
 use crate::{ literals, parsers };
 use core::{ convert::TryInto, fmt::Debug };
+use num_traits::{ float::FloatCore };
 
 literals! {
     pub WhitespaceChar => '\u{0020}' | '\u{000D}' | '\u{000A}' | '\u{0009}';
@@ -199,12 +200,11 @@ pub struct NumberValue {
     pub exponent: i32,
 }
 
-#[cfg(feature = "std")]
 impl Into<f64> for NumberValue {
-    fn into(self) -> f64 {
-        (self.integer as f64 + self.fraction as f64 / 10f64.powi(self.fraction_length as i32))
-            * 10f64.powi(self.exponent)
-    }
+  fn into(self) -> f64 {
+    (self.integer as f64 + self.fraction as f64 / 10f64.powi(self.fraction_length as i32))
+      * 10f64.powi(self.exponent)
+  }
 }
 
 #[derive(Debug, Clone, PartialEq)]
@@ -240,6 +240,13 @@ impl JsonValue {
       return val.iter().map(|c| *c as u8).collect::<Vec<_>>();
     }
     panic!("JsonValue not a type of JsonValue::String");
+  }
+
+  pub fn get_number_f64(&self) -> f64 {
+    if let JsonValue::Number(val) = self {
+      return (val.clone()).into();
+    }
+    panic!("JsonValue not a type of JsonValue::Number");
   }
 }
 
