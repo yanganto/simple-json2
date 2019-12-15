@@ -3,7 +3,15 @@ use simple_json::{ self, json, json::JsonValue, json::JsonObject };
 const ZERO_ASCII: u64 = 48;
 
 fn main() {
-  coinmarketcap();
+  parse_json_f64();
+}
+
+fn parse_json_f64() {
+  let json_str = r#"{"USD":7073.33}"#;
+  let json_val: JsonValue = simple_json::parse_json(&json_str).unwrap();
+  let data = json_val.get_object()[0].1.get_number_f64();
+
+  println!("{:?}", data);
 }
 
 fn coincap() {
