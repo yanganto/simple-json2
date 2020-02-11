@@ -1,3 +1,5 @@
+#![allow(dead_code)]
+
 use simple_json::{ self, json, json::JsonValue, json::JsonObject };
 
 const ZERO_ASCII: u64 = 48;

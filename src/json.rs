@@ -7,6 +7,8 @@ use crate::parser::{
 };
 use crate::{ literals, parsers };
 use core::{ convert::TryInto, fmt::Debug };
+
+#[cfg(not(feature = "std"))]
 use num_traits::{ float::FloatCore };
 
 literals! {
