@@ -12,5 +12,5 @@ pub mod parser;
 mod tests;
 
 pub fn parse_json(input: &str) -> Result<JsonValue, SimpleError> {
-  Json::parse(&input, Default::default()).map(|(ret, _)| ret)
+	Json::parse(&input, Default::default()).map(|(ret, _)| ret)
 }
