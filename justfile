@@ -9,3 +9,7 @@ test:
 alias r := run
 run:
 	cargo remote -- run --release
+
+alias c := clean
+clean:
+	cargo remote -- clean

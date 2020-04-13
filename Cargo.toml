@@ -1,7 +1,7 @@
 [package]
 name = "simple-json"
-version = "0.1.5"
-authors = [""]
+version = "0.1.6"
+authors = ["Xiliang Chen<xlc>", "Jimmy Chu<jimmychu0807>"]
 edition = "2018"
 
 [dependencies]
