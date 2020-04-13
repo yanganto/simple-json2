@@ -1,28 +1,30 @@
 #![allow(dead_code)]
 
-use simple_json::{ self, json, json::JsonValue, json::JsonObject };
+use simple_json::{ self, json, json::JsonValue, json::JsonObject, impls::SimpleError };
+use simple_json::parser::Error;
 
 const ZERO_ASCII: u64 = 48;
 
-fn main() {
-	parse_json_f64();
-	coincap();
-	coinmarketcap();
+fn main() -> Result<(), SimpleError> {
+	parse_json_f64()?;
+	coincap()?;
+	coinmarketcap()?;
+	Ok(())
 }
 
-fn parse_json_f64() -> Result<(), json::GetJsonValueErr> {
+fn parse_json_f64() -> Result<(), SimpleError> {
 	let json_str = r#"{"USD":7073.33}"#;
 	let json_val: JsonValue = simple_json::parse_json(&json_str)?;
-	let data = json_val.get_object().unwrap()[0].1.get_number_f64()?;
+	let data = json_val.get_object()?[0].1.get_number_f64()?;
 	println!("{:?}", data);
 	Ok(())
 }
 
-fn coincap() {
+fn coincap() -> Result<(), SimpleError> {
 	let json_str = r#"{"data":{"id":"bitcoin","rank":"1","symbol":"BTC","name":"Bitcoin","supply":"18057312.0000000000000000","maxSupply":"21000000.0000000000000000","marketCapUsd":"147569099750.7204918604574592","volumeUsd24Hr":"4580709179.8339913779178792","priceUsd":"8172.2628346190447316","changePercent24Hr":"0.2545279279476533","vwap24Hr":"8137.7203001478675222"},"timestamp":1574224303089}"#;
 
-	let json_val: JsonValue = simple_json::parse_json(&json_str).unwrap();
-	let data = json_val.get_object().unwrap()[0].1.get_object().unwrap();
+	let json_val: JsonValue = simple_json::parse_json(&json_str)?;
+	let data = json_val.get_object()?[0].1.get_object()?;
 
 	let mut sym: Vec<u8> = Vec::new();
 	let mut dollars: Vec<u8> = Vec::new();
@@ -30,33 +32,34 @@ fn coincap() {
 	let price_bytes = "priceUsd".as_bytes().to_vec();
 	let sym_bytes = "symbol".as_bytes().to_vec();
 
-	// data.iter()
-	//   .filter(|(k, _)| {
-	//     let k_bytes = k.iter().map(|c| *c as u8).collect::<Vec<_>>();
-	//     k_bytes == price_bytes || k_bytes == sym_bytes
-	//   })
-	//   .for_each(|(k, v)| {
-	//     let k_bytes = k.iter().map(|c| *c as u8).collect::<Vec<_>>();
-	//     let val = v.get_bytes();
-	//     match k_bytes {
-	//       k_bytes if k_bytes == price_bytes => {
-	//         let dot_pos = val.iter().position(|&i| i == ('.' as u8)).unwrap();
-	//         dollars = val.get(0..dot_pos).unwrap().to_vec();
-	//         cents = val.get((dot_pos + 1)..).unwrap().to_vec();
-	//       },
-	//       k_bytes if k_bytes == sym_bytes => { sym = val.clone(); },
-	//       _ => { panic!("Unexpected type"); },
-	//     };
-	//   });
+	data.iter()
+		.filter(|(k, _)| {
+			let k_bytes = k.iter().map(|c| *c as u8).collect::<Vec<_>>();
+			k_bytes == price_bytes || k_bytes == sym_bytes
+		})
+		.for_each(|(k, v)| {
+			let k_bytes = k.iter().map(|c| *c as u8).collect::<Vec<_>>();
+			let val = v.get_bytes().unwrap();
+			match k_bytes {
+				k_bytes if k_bytes == price_bytes => {
+					let dot_pos = val.iter().position(|&i| i == ('.' as u8)).unwrap();
+					dollars = val.get(0..dot_pos).unwrap().to_vec();
+					cents = val.get((dot_pos + 1)..).unwrap().to_vec();
+				},
+				k_bytes if k_bytes == sym_bytes => { sym = val.clone(); },
+				_ => { SimpleError::plain_str("Unexpected type"); },
+			};
+		});
 
-	// println!("{:?}, {:?}, {:?}",
-	//   String::from_utf8(sym).unwrap(),
-	//   String::from_utf8(dollars).unwrap(),
-	//   String::from_utf8(cents).unwrap(),
-	// );
+	println!("{:?}, {:?}, {:?}",
+		String::from_utf8(sym).unwrap(),
+		String::from_utf8(dollars).unwrap(),
+		String::from_utf8(cents).unwrap(),
+	);
+	Ok(())
 }
 
-fn coinmarketcap() {
+fn coinmarketcap() -> Result<(), SimpleError> {
 	let json_str = r#"{
 		"status": {
 			"timestamp": "2019-12-05T14:57:06.935Z",
@@ -94,25 +97,25 @@ fn coinmarketcap() {
 				}
 			}}}"#;
 
-	let json_val: JsonValue = simple_json::parse_json(&json_str).unwrap();
-	let btc_data: &JsonObject = json_val.get_object().unwrap()[1]
-		.1.get_object().unwrap()[0]
-		.1.get_object().unwrap();
+	let json_val: JsonValue = simple_json::parse_json(&json_str)?;
+	let btc_data: &JsonObject = json_val.get_object()?[1]
+		.1.get_object()?[0]
+		.1.get_object()?;
 
 	let quote_usd_data: &JsonObject = btc_data.iter()
 		.filter_map(|(k, v)|
 			if vecchars_to_vecbytes(k) == str_to_vecbytes("quote") { Some(v) } else { None }
 		)
-		.nth(0).unwrap()
-		.get_object().unwrap()[0]
-		.1.get_object().unwrap();
+		.nth(0).ok_or(SimpleError::plain_str("option::NoneError"))?
+		.get_object()?[0]
+		.1.get_object()?;
 
 	// println!("{:?}", quote_usd_data);
 	let price: &JsonValue = quote_usd_data.iter()
 		.filter_map(|(k, v)|
 			if vecchars_to_vecbytes(k) == str_to_vecbytes("price") { Some(v) } else { None }
 		)
-		.nth(0).unwrap();
+		.nth(0).ok_or(SimpleError::plain_str("option::NoneError"))?;
 
 	// print!("{:?}", price);
 	if let JsonValue::Number(json::NumberValue{integer: dollars, fraction: cents, ..}) = price {
@@ -120,6 +123,7 @@ fn coinmarketcap() {
 		println!("{:?}, {:?}", dollars, vecbytes_to_u64(u64_to_vecbytes(*cents),4));
 	}
 
+	Ok(())
 }
 
 fn vecchars_to_vecbytes<I: IntoIterator<Item = char> + Clone>(it: &I) -> Vec<u8> {

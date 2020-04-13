@@ -14,6 +14,7 @@ pub trait Error {
 
 	fn reasons(&self) -> &[(Option<Self::Position>, &'static str)];
 	fn add_reason(self, position: Option<Self::Position>, reason: &'static str) -> Self;
+	fn plain_str(reason: &'static str) -> Self;
 }
 
 pub trait Input: Default {

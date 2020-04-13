@@ -5,7 +5,7 @@ use crate::parser::{
 	Concat, Concat3, Either, Error, Input, OneOf, OneOrMore, Parser, ResultOf, ZeroOrMore,
 	ZeroOrOne,
 };
-use crate::{ literals, parsers };
+use crate::{ literals, parsers, impls::SimpleError };
 use core::{ convert::TryInto, fmt::Debug };
 
 #[cfg(not(feature = "std"))]
@@ -229,39 +229,39 @@ pub enum JsonValue {
 }
 
 impl JsonValue {
-  pub fn get_object(&self) -> Result<&JsonObject, GetJsonValueErr> {
-	if let JsonValue::Object(obj) = self {
-		return Ok(&obj);
-	}
-	Err(GetJsonValueErr::ObjectErr)
+  pub fn get_object(&self) -> Result<&JsonObject, SimpleError> {
+		if let JsonValue::Object(obj) = self {
+			return Ok(&obj);
+		}
+		Err(SimpleError::plain_str("get_object error"))
   }
 
-  pub fn get_array(&self) -> Result<&Vec<JsonValue>, GetJsonValueErr> {
-	if let JsonValue::Array(vec) = self {
-		return Ok(&vec);
-	}
-	Err(GetJsonValueErr::ArrayErr)
+  pub fn get_array(&self) -> Result<&Vec<JsonValue>, SimpleError> {
+		if let JsonValue::Array(vec) = self {
+			return Ok(&vec);
+		}
+		Err(SimpleError::plain_str("get_array error"))
   }
 
-  pub fn get_string(&self) -> Result<AllocString, GetJsonValueErr> {
-	if let JsonValue::String(val) = self {
-	  return Ok(val.iter().collect::<AllocString>());
-	}
-	Err(GetJsonValueErr::StringErr)
+  pub fn get_string(&self) -> Result<AllocString, SimpleError> {
+		if let JsonValue::String(val) = self {
+		  return Ok(val.iter().collect::<AllocString>());
+		}
+		Err(SimpleError::plain_str("get_string error"))
   }
 
-  pub fn get_bytes(&self) -> Result<Vec<u8>, GetJsonValueErr> {
-	if let JsonValue::String(val) = self {
-	  return Ok(val.iter().map(|c| *c as u8).collect::<Vec<_>>());
-	}
-	Err(GetJsonValueErr::BytesErr)
+  pub fn get_bytes(&self) -> Result<Vec<u8>, SimpleError> {
+		if let JsonValue::String(val) = self {
+		  return Ok(val.iter().map(|c| *c as u8).collect::<Vec<_>>());
+		}
+		Err(SimpleError::plain_str("get_bytes error"))
   }
 
-  pub fn get_number_f64(&self) -> Result<f64, GetJsonValueErr> {
-	if let JsonValue::Number(val) = self {
-	  return Ok(val.clone().into());
-	}
-	Err(GetJsonValueErr::NumberF64Err)
+  pub fn get_number_f64(&self) -> Result<f64, SimpleError> {
+		if let JsonValue::Number(val) = self {
+		  return Ok(val.clone().into());
+		}
+		Err(SimpleError::plain_str("get_number_f64 error"))
   }
 }
 

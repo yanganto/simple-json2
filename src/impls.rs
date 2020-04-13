@@ -64,4 +64,8 @@ impl Error for SimpleError {
 		reasons.push((position, reason));
 		Self { reasons }
 	}
+
+	fn plain_str(reason: &'static str) -> Self {
+		Self { reasons: vec![(None, reason)] }
+	}
 }
