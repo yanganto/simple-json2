@@ -66,6 +66,8 @@ impl Error for SimpleError {
 	}
 
 	fn plain_str(reason: &'static str) -> Self {
-		Self { reasons: vec![(None, reason)] }
+		let mut reasons = Vec::new();
+		reasons.push((None, reason));
+		SimpleError { reasons }
 	}
 }

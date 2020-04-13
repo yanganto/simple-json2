@@ -163,7 +163,9 @@ impl Input for &str {
 	}
 
 	fn error_at(&self, pos: Self::Position, reason: &'static str) -> Self::Error {
-		SimpleError { reasons: vec![(Some(pos), reason)] }
+		let mut reasons = Vec::new();
+		reasons.push((Some(pos), reason));
+		SimpleError { reasons }
 	}
 }
 
