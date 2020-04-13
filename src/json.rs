@@ -209,15 +209,6 @@ impl Into<f64> for NumberValue {
   }
 }
 
-#[derive(Debug, Clone)]
-pub enum GetJsonValueErr {
-	ObjectErr,
-	ArrayErr,
-	StringErr,
-	BytesErr,
-	NumberF64Err,
-}
-
 #[derive(Debug, Clone, PartialEq)]
 pub enum JsonValue {
 	Object(JsonObject),
