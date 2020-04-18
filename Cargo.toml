@@ -6,6 +6,7 @@ description = "Simple JSON parser. Wasm / no_std ready."
 edition = "2018"
 repository = "https://github.com/jimmychu0807/simple-json2"
 license = "MIT OR Apache-2.0"
+readme = "README.md"
 categories = [
 	"no-std",
 ]
