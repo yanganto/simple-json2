@@ -203,11 +203,13 @@ pub struct NumberValue {
 }
 
 impl Into<f64> for NumberValue {
-  fn into(self) -> f64 {
+	fn into(self) -> f64 {
 	(self.integer as f64 + self.fraction as f64 / 10f64.powi(self.fraction_length as i32))
-	  * 10f64.powi(self.exponent)
-  }
+		* 10f64.powi(self.exponent)
+	}
 }
+
+pub type JsonObject = Vec<(Vec<char>, JsonValue)>;
 
 #[derive(Debug, Clone, PartialEq)]
 pub enum JsonValue {
@@ -220,40 +222,61 @@ pub enum JsonValue {
 }
 
 impl JsonValue {
-  pub fn get_object(&self) -> Result<&JsonObject, SimpleError> {
+	pub fn get_object(&self) -> Result<&JsonObject, SimpleError> {
 		if let JsonValue::Object(obj) = self {
 			return Ok(&obj);
 		}
 		Err(SimpleError::plain_str("get_object error"))
-  }
+	}
 
-  pub fn get_array(&self) -> Result<&Vec<JsonValue>, SimpleError> {
+	pub fn get_array(&self) -> Result<&Vec<JsonValue>, SimpleError> {
 		if let JsonValue::Array(vec) = self {
 			return Ok(&vec);
 		}
 		Err(SimpleError::plain_str("get_array error"))
-  }
+	}
 
-  pub fn get_string(&self) -> Result<AllocString, SimpleError> {
+	pub fn get_string(&self) -> Result<AllocString, SimpleError> {
 		if let JsonValue::String(val) = self {
-		  return Ok(val.iter().collect::<AllocString>());
+			return Ok(val.iter().collect::<AllocString>());
 		}
 		Err(SimpleError::plain_str("get_string error"))
-  }
+	}
 
-  pub fn get_bytes(&self) -> Result<Vec<u8>, SimpleError> {
+	pub fn get_chars(&self) -> Result<Vec<char>, SimpleError> {
 		if let JsonValue::String(val) = self {
-		  return Ok(val.iter().map(|c| *c as u8).collect::<Vec<_>>());
+			return Ok(val.iter().map(|c| *c).collect::<Vec<char>>());
+		}
+		Err(SimpleError::plain_str("get_chars error"))
+	}
+
+	pub fn get_bytes(&self) -> Result<Vec<u8>, SimpleError> {
+		if let JsonValue::String(val) = self {
+			return Ok(val.iter().map(|c| *c as u8).collect::<Vec<_>>());
 		}
 		Err(SimpleError::plain_str("get_bytes error"))
-  }
+	}
 
-  pub fn get_number_f64(&self) -> Result<f64, SimpleError> {
+	pub fn get_number_f64(&self) -> Result<f64, SimpleError> {
 		if let JsonValue::Number(val) = self {
-		  return Ok(val.clone().into());
+			return Ok(val.clone().into());
 		}
 		Err(SimpleError::plain_str("get_number_f64 error"))
-  }
+	}
+
+	pub fn get_bool(&self) -> Result<bool, SimpleError> {
+		if let JsonValue::Boolean(val) = self {
+			return Ok(*val);
+		}
+		Err(SimpleError::plain_str("get_bool error"))
+	}
+
+	pub fn is_null(&self) -> bool {
+		if let JsonValue::Null = self {
+			return true;
+		}
+		false
+	}
 }
 
 impl<I: Input> Parser<I> for Value
@@ -290,8 +313,6 @@ where
 }
 
 pub struct Object;
-
-pub type JsonObject = Vec<(Vec<char>, JsonValue)>;
 
 impl<I: Input> Parser<I> for Object {
 	type Output = JsonObject;

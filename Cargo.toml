@@ -1,8 +1,13 @@
 [package]
-name = "simple-json"
-version = "0.1.6"
-authors = ["Xiliang Chen<xlc>", "Jimmy Chu<jimmychu0807>"]
+name = "simple-json2"
+version = "0.1.1"
+authors = ["Bryan Chen<xlchen1291@gmail.com>", "Jimmy Chu<jimmychu0807@gmail.com>"]
+description = "Simple JSON parser. Wasm / no_std ready."
 edition = "2018"
+repository = "https://github.com/jimmychu0807/simple-json2"
+categories = [
+	"no-std",
+]
 
 [dependencies]
 paste = "0.1"
