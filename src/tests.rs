@@ -19,6 +19,17 @@ fn simple_test() {
 }
 
 #[test]
+fn empty_array_test() {
+	assert_eq!(
+		parse_json(&r#"{"E": []}"#)
+			.map_err(|_| ()),
+		Ok(JsonValue::Object(vec![(
+			vec!['E'], JsonValue::Array(vec![])
+		)]))
+	);
+}
+
+#[test]
 fn thorough_test() {
 	assert_eq!(
 		parse_json(&r#"{
